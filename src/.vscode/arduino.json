@@ -1,0 +1,6 @@
+{
+    "configuration": "FlashFreq=80,UploadSpeed=921600,DebugLevel=verbose,PartitionScheme=default",
+    "board": "esp32:esp32:featheresp32",
+    "port": "/dev/tty.usbserial-022F2BB1",
+    "sketch": "K1GBD_SATROT_2_0_CONTROL_MODULE.ino"
+}
