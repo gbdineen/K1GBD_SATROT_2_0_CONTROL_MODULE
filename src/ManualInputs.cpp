@@ -88,39 +88,53 @@ void ManualInputs::encoderCheck() {
 }
 
 void ManualInputs::updateEncPos(uint8_t enc) {
+
+    int dir; 
     
     // Make clockwise turns positive not negative, which is default for some reason
-    uint32_t encInvPos = -encoders[enc].getEncoderPosition();
+    double encInvPos = -encoders[enc].getEncoderPosition();
 
     //Serial.print("Enc "); Serial.print(enc); Serial.print("Pos "); Serial.println(encInvPos);
     // ************************************************************************************
     // Set servo range limits so we don't rotate too far
     // ************************************************************************************
-    if (!rollControl) {
-        if (enc==0) {  // Azimuth Limits
-            // if (encInvPos<0) {
-            //     encInvPos=0;
-            // } else if (encInvPos>360) {
-            //     encInvPos=360;
-            // }
-        } else if (enc==1) { // Elevation Limits
-            if (encInvPos<0) {
-                encInvPos=0;
-            } else if (encInvPos>90) {
-                encInvPos=90;
-            }
+    // if (!rollControl) {
+    //     if (enc==0) {  // Azimuth Limits
+    //         // if (encInvPos<0) {
+    //         //     encInvPos=0;
+    //         // } else if (encInvPos>360) {
+    //         //     encInvPos=360;
+    //         // }
+    //     } else if (enc==1) { // Elevation Limits
+    //         if (encInvPos<0) {
+    //             encInvPos=0;
+    //         } else if (encInvPos>90) {
+    //             encInvPos=90;
+    //         }
+    //     }
+    // }
+
+    if (!rollControl)
+    {
+        if (encInvPos>=0) {
+            dir = 0;
+        } else {
+            dir = 1;
+            encInvPos = (-encInvPos);
         }
     }
 
+
     StaticJsonDocument<200> encObj;
     encObj["Subject"] = "manualposition";
-    encObj["Encoder"] = enc;
+    encObj["Servo"] = enc;
     encObj["Position"] = encInvPos;
     encObj["RollControl"] = rollControl;
+    encObj["Direction"] = dir;
     String encStr;
     //String &s = encStr;
     serializeJson(encObj, encStr);
-    //Serial.print("ManualInputs::updateEncPos "); Serial.println(encStr);
+    Serial.print("ManualInputs::updateEncPos "); Serial.println(encStr);
     //ws.broadcastToClient(encStr); 
     ws->broadcastToClient(encStr); 
  
