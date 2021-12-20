@@ -116,11 +116,13 @@ void ManualInputs::updateEncPos(uint8_t enc) {
 
     if (!rollControl)
     {
-        if (encInvPos>=0) {
+        if (encInvPos>0) {
             dir = 0;
-        } else {
+        } else if (encInvPos<0) {
             dir = 1;
             encInvPos = (-encInvPos);
+        } else if (encInvPos==0) {
+          dir = 2;
         }
     }
 
