@@ -72,9 +72,9 @@ void WS_Server::webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_
       break;
     case WStype_TEXT: // check responce from client
       //Serial.print("WS Type "); Serial.println(type);
-      String pay = String((char*) payload);
-      Serial.println(pay);
-      broadcastToClient("WS_Server -> TEXT RECEIEVED") ;
+      // String pay = String((char*) payload);
+      // Serial.println(pay);
+      // broadcastToClient("WS_Server -> TEXT RECEIEVED") ;
       break;
   }
 }
