@@ -114,19 +114,18 @@ void ManualInputs::updateEncPos(uint8_t enc) {
     //     }
     // }
 
-    if (!rollControl)
-    {
-        if (encInvPos>0) {
-            dir = 0;
-        } else if (encInvPos<0) {
-            dir = 1;
-            encInvPos = (-encInvPos);
-        } else if (encInvPos==0) {
-          dir = 2;
-        }
-    }
-
-
+    //if (!rollControl)
+    //{
+	if (encInvPos>0) {
+		dir = 0;
+	} else if (encInvPos<0) {
+		dir = 1;
+		encInvPos = (-encInvPos);
+	} else if (encInvPos==0) {
+		dir = 2;
+	}
+    //}
+   
     StaticJsonDocument<200> encObj;
     encObj["Subject"] = "manualposition";
     encObj["Servo"] = enc;
