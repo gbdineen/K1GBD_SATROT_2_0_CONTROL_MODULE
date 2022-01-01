@@ -22,8 +22,8 @@ class WS_Server
         
         WS_Server();
         ~WS_Server();
-        void initWebSocketServer();
-        void webSocketLoop();
+        void begin();
+        void loop();
         void broadcastToClient(String tx);
         
 };

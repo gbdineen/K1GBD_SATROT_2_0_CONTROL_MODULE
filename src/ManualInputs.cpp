@@ -11,7 +11,14 @@ ManualInputs::ManualInputs(WS_Server * wsServer)
     this->ws = wsServer;
 }
 
+void ManualInputs::begin()
+{
+	initRotaryEncoders();
+	initPushButton();
+}
+
 void ManualInputs::initRotaryEncoders() {
+	
   //Serial.println("Looking for seesaws!");
   for (uint8_t enc=0; enc<sizeof(found_encoders); enc++) {
     if (! encoders[enc].begin(SEESAW_BASE_ADDR + enc) ||  // See if we can find encoders on this address 
@@ -43,6 +50,11 @@ void ManualInputs::initRotaryEncoders() {
       found_encoders[enc] = true;
     }
   }
+}
+
+void ManualInputs::initPushButton() {
+  pinMode(BTN_INPUT,INPUT);
+  //pinMode(RST_INPUT,INPUT_PULLUP);
 }
 
 void ManualInputs::encoderCheck() {
@@ -87,6 +99,28 @@ void ManualInputs::encoderCheck() {
   } 
 }
 
+void ManualInputs::buttonCheck()
+{
+	uint8_t btnState = digitalRead(BTN_INPUT);
+	//uint8_t rstBtnState = digitalRead(RST_INPUT);
+  
+	// Check silver button for manual servo control
+	if (btnState==HIGH)
+	{
+		if (!manualControl)
+		{
+		initManualControl();
+		}
+	}
+	else if (btnState==LOW)
+	{
+		if (manualControl)
+		{
+		disableManualControl();
+		}
+	}
+}
+
 void ManualInputs::updateEncPos(uint8_t enc) {
 
     int dir; 
@@ -94,29 +128,7 @@ void ManualInputs::updateEncPos(uint8_t enc) {
     // Make clockwise turns positive not negative, which is default for some reason
     double encInvPos = -encoders[enc].getEncoderPosition();
 
-    //Serial.print("Enc "); Serial.print(enc); Serial.print("Pos "); Serial.println(encInvPos);
-    // ************************************************************************************
-    // Set servo range limits so we don't rotate too far
-    // ************************************************************************************
-    // if (!rollControl) {
-    //     if (enc==0) {  // Azimuth Limits
-    //         // if (encInvPos<0) {
-    //         //     encInvPos=0;
-    //         // } else if (encInvPos>360) {
-    //         //     encInvPos=360;
-    //         // }
-    //     } else if (enc==1) { // Elevation Limits
-    //         if (encInvPos<0) {
-    //             encInvPos=0;
-    //         } else if (encInvPos>90) {
-    //             encInvPos=90;
-    //         }
-    //     }
-    // }
-
-    //if (!rollControl)
-    //{
-	if (encInvPos>0) {
+    if (encInvPos>0) {
 		dir = 0;
 	} else if (encInvPos<0) {
 		dir = 1;
@@ -124,44 +136,26 @@ void ManualInputs::updateEncPos(uint8_t enc) {
 	} else if (encInvPos==0) {
 		dir = 2;
 	}
-    //}
-   
+
     StaticJsonDocument<200> encObj;
-    encObj["Subject"] = "manualposition";
-    encObj["Servo"] = enc;
-    encObj["Position"] = encInvPos;
-    encObj["RollControl"] = rollControl;
-    encObj["Direction"] = dir;
+	if (manualControl)
+	{
+		encObj["Subject"] = "manualcontrol";
+		encObj["Servo"] = enc;
+		encObj["Position"] = encInvPos;
+		encObj["RollControl"] = rollControl;
+		encObj["Direction"] = dir;
+	}
+	else
+	{
+		encObj["Subject"] = "autocontrol";
+		encObj["Azimuth"] = -encoders[0].getEncoderPosition();
+		encObj["Elevation"] = -encoders[1].getEncoderPosition();;
+	}	
     String encStr;
-    //String &s = encStr;
     serializeJson(encObj, encStr);
     Serial.print("ManualInputs::updateEncPos "); Serial.println(encStr);
-    //ws.broadcastToClient(encStr); 
     ws->broadcastToClient(encStr); 
- 
- 
-//   object["RollControl"] = rollControl;
-//   serializeJson(doc, jsonString); // serialize the object and save teh result to teh string variable.
-//   //Serial.println( jsonString ); // print the string for debugging.
-//   webSocket.broadcastTXT(jsonString); // send the JSON object through the websocket
-//   jsonString = ""; // clear the String.
-  
-  //uint8_t pos = encoders[enc].getEncoderPosition();
-  
-}
-
-void ManualInputs::setEncPixelColorAll(uint32_t r, uint32_t g, uint32_t b) {
-  for (uint8_t enc=0; enc<=1; enc++) {
-    encoder_pixels[enc].setPixelColor(0,r,g,b);
-    encoder_pixels[enc].setBrightness(255);
-    encoder_pixels[enc].show();
-  }
-}
-
-void ManualInputs::setEncPixelColorSingle(uint8_t whatEnc, uint32_t r, uint32_t g, uint32_t b) {
-  encoder_pixels[whatEnc].setPixelColor(0,r,g,b);
-  encoder_pixels[whatEnc].setBrightness(255);
-  encoder_pixels[whatEnc].show();
 }
 
 void ManualInputs::initRollControl(uint8_t whatEnc) {
@@ -189,7 +183,7 @@ void ManualInputs::initRollControl(uint8_t whatEnc) {
 
 void ManualInputs::disableRollControl(uint8_t whatEnc) {
 
-  if (manualServo) {
+  if (manualControl) {
     setEncPixelColorSingle(whatEnc,0,255,0);
   } else {
     setEncPixelColorSingle(whatEnc,255,0,0);
@@ -245,7 +239,7 @@ void ManualInputs::initManualControl() {
     // spr.drawString(txt,tft.width()/2, fontPx/2);
     // spr.pushSprite(0,h);
     // digitalWrite(TFT1, HIGH);
-    manualServo=true;
+    manualControl=true;
   //}
 }
 
@@ -270,8 +264,28 @@ void ManualInputs::disableManualControl() {
     // spr.pushSprite(0,h);
     // digitalWrite(TFT1, HIGH);
     
-    manualServo=false;
+    manualControl=false;
   //}
+}
+
+void ManualInputs::setEncPixelColorAll(uint32_t r, uint32_t g, uint32_t b) {
+  for (uint8_t enc=0; enc<=1; enc++) {
+    encoder_pixels[enc].setPixelColor(0,r,g,b);
+    encoder_pixels[enc].setBrightness(255);
+    encoder_pixels[enc].show();
+  }
+}
+
+void ManualInputs::setEncPixelColorSingle(uint8_t whatEnc, uint32_t r, uint32_t g, uint32_t b) {
+  encoder_pixels[whatEnc].setPixelColor(0,r,g,b);
+  encoder_pixels[whatEnc].setBrightness(255);
+  encoder_pixels[whatEnc].show();
+}
+
+void ManualInputs::loop()
+{
+	encoderCheck();
+	buttonCheck();
 }
 
 ManualInputs::~ManualInputs()

@@ -22,14 +22,14 @@ void setup()
         ; // wait for serial port to connect. Needed for native USB
     }
 
-    wsServer.initWebSocketServer();
-    manualInputs.initRotaryEncoders();
+    wsServer.begin();
+    manualInputs.begin();
 
 }
 
 void loop() 
 {
-   wsServer.webSocketLoop();
-   manualInputs.encoderCheck();
+   wsServer.loop();
+   manualInputs.loop();
 }
 

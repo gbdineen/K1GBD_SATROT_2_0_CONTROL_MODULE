@@ -8,12 +8,12 @@ WS_Server::WS_Server()
 }
 
 
-void WS_Server::webSocketLoop()
+void WS_Server::loop()
 {
   webSocket.loop();
 }
 
-void WS_Server::initWebSocketServer()
+void WS_Server::begin()
 {
   webSocket.close();
   Serial.println("initWebSocketServer");
