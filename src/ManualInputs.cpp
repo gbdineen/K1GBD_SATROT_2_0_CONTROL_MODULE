@@ -223,6 +223,15 @@ void ManualInputs::initManualControl() {
   //if (!manualServo) {
     
     setEncPixelColorAll(0,255,0);
+	
+	StaticJsonDocument<200> obj;
+	obj["Subject"] = "manualcontrol";
+	String str;
+    serializeJson(obj, str);
+    
+	ws->broadcastToClient(str); 
+
+
 
     // digitalWrite(TFT1, LOW);
     // String txt = "Manual servo active";
@@ -247,6 +256,13 @@ void ManualInputs::disableManualControl() {
   //if (manualServo) {
 
     setEncPixelColorAll(255,0,0);
+
+	StaticJsonDocument<200> obj;
+	obj["Subject"] = "autocontrol";
+	String str;
+    serializeJson(obj, str);
+    
+	ws->broadcastToClient(str); 
 
     // digitalWrite(TFT1, LOW);
     // String txt = "Manual servo inactive";
