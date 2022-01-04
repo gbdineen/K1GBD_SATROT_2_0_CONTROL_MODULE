@@ -225,7 +225,8 @@ void ManualInputs::initManualControl() {
     setEncPixelColorAll(0,255,0);
 	
 	StaticJsonDocument<200> obj;
-	obj["Subject"] = "manualcontrol";
+	obj["Subject"] = "controlmethod";
+  obj["ControlMethod"] = 0; // 0 = MANUAL as defined in PositionControl on the tracker side
 	String str;
     serializeJson(obj, str);
     
@@ -234,7 +235,7 @@ void ManualInputs::initManualControl() {
 
 
     // digitalWrite(TFT1, LOW);
-    // String txt = "Manual servo active";
+    // String txt = "Manual servo axctive";
     // uint16_t tw = tft.textWidth(txt);
     // uint16_t x = (tft.width()-tw)/2;
     // uint16_t h = tft.height()-fontPx;
@@ -258,7 +259,8 @@ void ManualInputs::disableManualControl() {
     setEncPixelColorAll(255,0,0);
 
 	StaticJsonDocument<200> obj;
-	obj["Subject"] = "autocontrol";
+	obj["Subject"] = "controlmethod";
+  obj["ControlMethod"] = 1; // 1 = AUTO as defined in PositionControl on the tracker side
 	String str;
     serializeJson(obj, str);
     

@@ -9,6 +9,7 @@
 // Custom Classes
 #include "WS_Server.h"
 #include "ManualInputs.h"
+#include "UDPControl.h"
         
 WS_Server wsServer;
 WS_Server * wsServerPtr = &wsServer;
