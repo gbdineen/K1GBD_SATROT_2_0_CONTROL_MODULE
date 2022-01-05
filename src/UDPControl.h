@@ -3,6 +3,10 @@
 
 #include <Arduino.h>
 #include <AsyncUDP.h>
+#include <functional>
+#include <string>
+#include <iostream>
+#include <sstream>
 
 class UDPControl
 {
@@ -12,9 +16,11 @@ private:
     const int port = 9932;
     const int rele = 23;
     bool udpPingPong = false;
-    bool pauseUDP = true;
+    bool pauseUDP = false ;
     
-    String keps[];
+    //char * initkeps[];
+    char *keps[8];
+    char *ptr = NULL;
 
     void udpCheck();
 
@@ -24,7 +30,7 @@ public:
 
     void begin();
 
-    String parseUDP(AsyncUDPPacket packet);
+    void parseUDP(AsyncUDPPacket packet);
 
     void loop();
 

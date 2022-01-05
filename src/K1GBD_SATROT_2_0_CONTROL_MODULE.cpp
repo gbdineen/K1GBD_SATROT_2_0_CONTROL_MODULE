@@ -5,6 +5,8 @@
 #include <seesaw_neopixel.h>
 #include <ArduinoJson.h>
 #include <iostream>
+#include <functional>
+#include <string>
 
 // Custom Classes
 #include "WS_Server.h"
@@ -14,6 +16,7 @@
 WS_Server wsServer;
 WS_Server * wsServerPtr = &wsServer;
 ManualInputs manualInputs(wsServerPtr);
+UDPControl udpCtrl;
 
 
 void setup()  
@@ -25,6 +28,7 @@ void setup()
 
     wsServer.begin();
     manualInputs.begin();
+    udpCtrl.begin();
 
 }
 
