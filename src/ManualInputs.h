@@ -7,13 +7,19 @@
 #include <ArduinoJson.h>
 #include "WS_Server.h"
 
+#define MANUAL 0
+#define AUTO 1
+#define SS_SWITCH 24
+#define SS_NEOPIX 6
+#define SEESAW_BASE_ADDR 0x36
+#define BTN_INPUT 39
+
 class ManualInputs
 {
     private:
-        #define SS_SWITCH 24
-        #define SS_NEOPIX 6
-        #define SEESAW_BASE_ADDR 0x36
-        #define BTN_INPUT 39
+        
+        byte controlMethod = AUTO;
+
         // ROTARY ENCODERS
         int32_t encoder_position;
         uint8_t menuPos;
@@ -49,6 +55,9 @@ class ManualInputs
     public:
         ManualInputs();
         ManualInputs(WS_Server * wsServer);
+        
+        byte getControlMethod();
+        void setControlMethod(byte cm);
 
         void begin();
         void loop();

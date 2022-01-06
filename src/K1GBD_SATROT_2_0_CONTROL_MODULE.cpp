@@ -16,7 +16,8 @@
 WS_Server wsServer;
 WS_Server * wsServerPtr = &wsServer;
 ManualInputs manualInputs(wsServerPtr);
-UDPControl udpCtrl;
+ManualInputs * miPtr = &manualInputs;
+UDPControl udpCtrl(wsServerPtr, miPtr);
 
 
 void setup()  

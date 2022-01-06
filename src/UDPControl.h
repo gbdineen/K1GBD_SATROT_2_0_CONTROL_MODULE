@@ -7,12 +7,16 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include "WS_Server.h"
+#include "ManualInputs.h"
 
 class UDPControl
 {
 private:
     
     AsyncUDP udp;
+    WS_Server * ws;
+    ManualInputs * mi;
     const int port = 9932;
     const int rele = 23;
     bool udpPingPong = false;
@@ -27,6 +31,7 @@ private:
 public:
     
     UDPControl(/* args */);
+    UDPControl(WS_Server * ws, ManualInputs * mi);
 
     void begin();
 

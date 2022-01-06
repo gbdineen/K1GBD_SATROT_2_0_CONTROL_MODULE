@@ -300,6 +300,16 @@ void ManualInputs::setEncPixelColorSingle(uint8_t whatEnc, uint32_t r, uint32_t 
   encoder_pixels[whatEnc].show();
 }
 
+byte ManualInputs::getControlMethod()
+{
+	return this->controlMethod;
+}
+
+void ManualInputs::setControlMethod(byte cm)
+{
+	this->controlMethod=cm;
+}
+
 void ManualInputs::loop()
 {
 	encoderCheck();
