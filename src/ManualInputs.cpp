@@ -26,13 +26,13 @@ void ManualInputs::initRotaryEncoders() {
      Serial.print("Couldn't find encoder #");
      Serial.println(enc);
     } else {
-      Serial.print("Found encoder + pixel #");
-      Serial.println(enc);
+      //Serial.print("Found encoder + pixel #");
+      //Serial.println(enc);
       
       uint32_t version = ((encoders[enc].getVersion() >> 16) & 0xFFFF);
       if (version != 4991){
        // Serial.print("Wrong firmware loaded? ");
-        Serial.println(version);
+       Serial.println(version);
       //  while(1) delay(10);
       }
       //Serial.println("Found Product 4991");
@@ -62,6 +62,8 @@ void ManualInputs::encoderCheck() {
   for (uint8_t enc=0; enc<sizeof(found_encoders); enc++) { 
     if (found_encoders[enc] == false) continue;
     int32_t new_position = encoders[enc].getEncoderPosition();
+
+    
     new_position= -(new_position);  // Make sure clockwise turns are positive. Default is opposite for some reason. 
     
     if (encoder_positions[enc] != new_position) {  // Check for encoder dial movement
@@ -109,16 +111,26 @@ void ManualInputs::buttonCheck()
 	{
 		if (!manualControl)
 		{
-		initManualControl();
-		}
+			initManualControl();
+			for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
+			{ 
+				encoders[enc].setEncoderPosition(enc,0); // Set encoders to zero so as to jerk the antenna around
+			}
+    	}
 	}
 	else if (btnState==LOW)
 	{
 		if (manualControl)
 		{
 		disableManualControl();
+			for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
+			{ 
+				encoders[enc].setEncoderPosition(enc,0); // Set encoders to zero so as to jerk the antenna around
+			}
 		}
 	}
+
+	
 }
 
 void ManualInputs::updateEncPos(uint8_t enc) {
