@@ -111,22 +111,22 @@ void ManualInputs::buttonCheck()
 	{
 		if (!manualControl)
 		{
-			initManualControl();
 			for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
 			{ 
-				encoders[enc].setEncoderPosition(enc,0); // Set encoders to zero so as to jerk the antenna around
+				encoders[enc].setEncoderPosition(0); // Set encoders to zero so as to jerk the antenna around
 			}
-    	}
+      initManualControl();
+    }
 	}
 	else if (btnState==LOW)
 	{
 		if (manualControl)
 		{
-		disableManualControl();
 			for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
 			{ 
-				encoders[enc].setEncoderPosition(enc,0); // Set encoders to zero so as to jerk the antenna around
+				encoders[enc].setEncoderPosition(0); // Set encoders to zero so as to jerk the antenna around
 			}
+      disableManualControl();
 		}
 	}
 
@@ -135,23 +135,27 @@ void ManualInputs::buttonCheck()
 
 void ManualInputs::updateEncPos(uint8_t enc) {
 
-    int dir; 
     
-    // Make clockwise turns positive not negative, which is default for some reason
-    double encInvPos = -encoders[enc].getEncoderPosition();
-
-    if (encInvPos>0) {
-		dir = 0;
-	} else if (encInvPos<0) {
-		dir = 1;
-		encInvPos = (-encInvPos);
-	} else if (encInvPos==0) {
-		dir = 2;
-	}
-
+    
     StaticJsonDocument<200> encObj;
-	if (manualControl)
-	{
+    if (manualControl)
+    {
+
+      int dir; 
+
+      // Make clockwise turns positive not negative, which is default for some reason
+      double encInvPos = -encoders[enc].getEncoderPosition();
+
+
+      if (encInvPos>0) {
+        dir = 0;
+      } else if (encInvPos<0) {
+        dir = 1;
+        encInvPos = (-encInvPos);
+      } else if (encInvPos==0) {
+        dir = 2;
+    }
+
 		encObj["Subject"] = "manualcontrol";
 		encObj["Servo"] = enc;
 		encObj["Position"] = encInvPos;
