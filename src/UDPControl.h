@@ -21,6 +21,7 @@ private:
     const int rele = 23;
     bool udpPingPong = false;
     bool pauseUDP = false ;
+    bool udpActive;
     
     //char * initkeps[];
     char *keps[8];

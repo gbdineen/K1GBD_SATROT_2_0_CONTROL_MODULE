@@ -20,12 +20,19 @@ void UDPControl::begin()
 
 void UDPControl::udpCheck()
 {
-  	auto pfn = std::bind(&UDPControl::parseUDP, this, std::placeholders::_1);
+	
+	  
+	auto pfn = std::bind(&UDPControl::parseUDP, this, std::placeholders::_1);
 	if (udp.listen(port))
 	{
 		if (!pauseUDP)
 		{
-			udp.onPacket(pfn);
+			//Serial.println("UDP Listneing");
+			// if (ws->getCalibrationStatus())
+			// {
+				udp.onPacket(pfn);
+			// /}
+			
 			// udp.onPacket([&](AsyncUDPPacket packet)
 			// {
 			// 	parseUDP(packet);
@@ -36,9 +43,11 @@ void UDPControl::udpCheck()
 
 void UDPControl::parseUDP(AsyncUDPPacket packet)
 {
+	//Serial.println("Parsing UDP Packets");
 	if (packet.data()) {
 		//udpPingPong = true;
 		//tracking=true;
+		udpActive=true;
 		byte index = 0;
 		char *initkeps = (char*) packet.data();
 		initkeps[packet.length()] = '\0'; 
@@ -62,7 +71,7 @@ void UDPControl::parseUDP(AsyncUDPPacket packet)
 		if (mi->getControlMethod()==AUTO)
 		{
 			StaticJsonDocument<200> obj;
-			obj["Subject"] = "autocontrol";
+			obj["Subject"] = "udpcontrol";
 			obj["Azimuth"] = kepsAz;
 			obj["Elevation"] = kepsEl;
 			String str;

@@ -135,8 +135,6 @@ void ManualInputs::buttonCheck()
 
 void ManualInputs::updateEncPos(uint8_t enc) {
 
-    
-    
     StaticJsonDocument<200> encObj;
     if (manualControl)
     {

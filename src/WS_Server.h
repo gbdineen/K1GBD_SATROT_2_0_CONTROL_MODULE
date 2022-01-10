@@ -6,6 +6,7 @@
 #include <WebSocketsServer.h>
 #include <ArduinoJson.h>
 #include <iostream>
+#include <string>
 
 class WS_Server
 {
@@ -18,13 +19,18 @@ class WS_Server
         
         void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length);
 
+        uint8_t systemCalibrated;
+
     public:
         
         WS_Server();
         ~WS_Server();
         void begin();
-        void loop();
         void broadcastToClient(String tx);
+        void setCalibrationStatus(uint8_t cs);
+        bool getCalibrationStatus();
+        void loop();
+
         
 };
 

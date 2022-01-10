@@ -39,6 +39,22 @@ void WS_Server::broadcastToClient(String tx)
   webSocket.broadcastTXT(tx);
 }
 
+void WS_Server::setCalibrationStatus(uint8_t cs)
+{
+	this->systemCalibrated = cs;
+	Serial.print("\n=========== [Calibration status set: "); Serial.print(cs); Serial.print(" ]===========\n");
+	//return cs;
+}
+
+bool WS_Server::getCalibrationStatus()
+{
+
+	if (this->systemCalibrated)
+	{
+		return true;
+	}
+	return false;
+}
 
 void WS_Server::webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length)
 {
@@ -76,7 +92,11 @@ void WS_Server::webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_
 				serializeJson(obj,str);
 				broadcastToClient(str);
 			}
-
+			else if (subject="system-calibration-status")
+			{
+				setCalibrationStatus(obj["Calibraton-Status"]);
+			}
+			
 			break;
 	}
 }
