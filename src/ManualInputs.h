@@ -19,7 +19,10 @@ class ManualInputs
     private:
         
         byte controlMethod = AUTO;
-
+        int prevAz=false;
+        int prevEl=false;
+        int prevRoll=false;
+        
         // ROTARY ENCODERS
         int32_t encoder_position;
         uint8_t menuPos;
@@ -58,7 +61,8 @@ class ManualInputs
         
         byte getControlMethod();
         void setControlMethod(byte cm);
-
+        void setTargets(int az, int el, int roll);
+        
         void begin();
         void loop();
         ~ManualInputs();

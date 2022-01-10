@@ -56,6 +56,16 @@ bool WS_Server::getCalibrationStatus()
 	return false;
 }
 
+void WS_Server::setTargetsCallback(std::function<void(int az, int el, int roll)> cb)
+{
+    this->targetsCallback=cb;
+}
+
+void WS_Server::setTargets(int az, int el, int roll)
+{
+	targetsCallback(az,el,roll);
+}
+
 void WS_Server::webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length)
 {
 	//webSocketEventLocal(num,type,payload,length);
@@ -78,8 +88,8 @@ void WS_Server::webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_
 			break;
 		case WStype_TEXT: // check responce from client
 			
-			// String pay = (char*) payload;
-			// Serial.println(pay);
+			String pay = (char*) payload;
+			Serial.println(pay);
 
 			DeserializationError error = deserializeJson(obj, payload);
 			String subject = obj["Subject"];
@@ -92,10 +102,17 @@ void WS_Server::webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_
 				serializeJson(obj,str);
 				broadcastToClient(str);
 			}
-			else if (subject="system-calibration-status")
+			else if (subject=="system-calibration-status")
 			{
-				setCalibrationStatus(obj["Calibraton-Status"]);
+				setCalibrationStatus(obj["Calibration-Status"]);
 			}
+			else if (subject=="previous-targets")
+			{
+				Serial.print("\n----- [Setting Targets 3] -----]\n");
+				
+				this->targetsCallback(obj["Azimuth"],obj["Elevation"],obj["Roll"]);
+			}
+			
 			
 			break;
 	}

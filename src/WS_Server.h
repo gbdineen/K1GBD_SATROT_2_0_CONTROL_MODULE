@@ -20,6 +20,7 @@ class WS_Server
         void webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_t length);
 
         uint8_t systemCalibrated;
+        std::function<void(int az, int el, int roll)> targetsCallback;
 
     public:
         
@@ -29,6 +30,8 @@ class WS_Server
         void broadcastToClient(String tx);
         void setCalibrationStatus(uint8_t cs);
         bool getCalibrationStatus();
+        void setTargetsCallback(std::function<void(int az, int el, int roll)> cb);
+        void setTargets(int az, int el, int roll);
         void loop();
 
         

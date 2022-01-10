@@ -9,6 +9,9 @@ ManualInputs::ManualInputs()
 ManualInputs::ManualInputs(WS_Server * wsServer)
 {
     this->ws = wsServer;
+
+	auto TgPtr = std::bind(&ManualInputs::setTargets, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+	ws->setTargetsCallback(TgPtr);
 }
 
 void ManualInputs::begin()
@@ -111,26 +114,34 @@ void ManualInputs::buttonCheck()
 	{
 		if (!manualControl)
 		{
-			for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
+			initManualControl();
+      		for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
 			{ 
 				encoders[enc].setEncoderPosition(0); // Set encoders to zero so as to jerk the antenna around
 			}
-      initManualControl();
-    }
+			;
+		}
 	}
 	else if (btnState==LOW)
 	{
 		if (manualControl)
 		{
-			for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
-			{ 
-				encoders[enc].setEncoderPosition(0); // Set encoders to zero so as to jerk the antenna around
+			disableManualControl();
+			if (!prevAz || !prevEl|| !prevRoll)
+			{
+				for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
+				{ 
+					encoders[enc].setEncoderPosition(0); // Set encoders to zero so as to jerk the antenna around
+				}
 			}
-      disableManualControl();
+			else
+			{
+				encoders[0].setEncoderPosition(prevAz);
+				encoders[1].setEncoderPosition(prevEl);
+			}
+      		
 		}
 	}
-
-	
 }
 
 void ManualInputs::updateEncPos(uint8_t enc) {
@@ -240,7 +251,7 @@ void ManualInputs::initManualControl() {
 	
 	StaticJsonDocument<200> obj;
 	obj["Subject"] = "controlmethod";
-  obj["ControlMethod"] = 0; // 0 = MANUAL as defined in PositionControl on the tracker side
+   obj["ControlMethod"] = 0; // 0 = MANUAL as defined in PositionControl on the tracker side
 	String str;
     serializeJson(obj, str);
     
@@ -274,7 +285,7 @@ void ManualInputs::disableManualControl() {
 
 	StaticJsonDocument<200> obj;
 	obj["Subject"] = "controlmethod";
-  obj["ControlMethod"] = 1; // 1 = AUTO as defined in PositionControl on the tracker side
+    obj["ControlMethod"] = 1; // 1 = AUTO as defined in PositionControl on the tracker side
 	String str;
     serializeJson(obj, str);
     
@@ -322,6 +333,17 @@ byte ManualInputs::getControlMethod()
 void ManualInputs::setControlMethod(byte cm)
 {
 	this->controlMethod=cm;
+}
+
+void ManualInputs::setTargets(int az, int el, int roll)
+{
+
+	Serial.print("\n----- [Setting Targets 4] -----]\n");
+	
+	
+	this->prevAz = -az; // Negative because of course
+	this->prevEl = -el;
+	this->prevRoll = roll;
 }
 
 void ManualInputs::loop()
