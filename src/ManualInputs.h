@@ -9,6 +9,7 @@
 
 #define MANUAL 0
 #define AUTO 1
+#define UPD 2
 #define SS_SWITCH 24
 #define SS_NEOPIX 6
 #define SEESAW_BASE_ADDR 0x36

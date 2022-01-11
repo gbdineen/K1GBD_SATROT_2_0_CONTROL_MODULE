@@ -333,6 +333,13 @@ byte ManualInputs::getControlMethod()
 void ManualInputs::setControlMethod(byte cm)
 {
 	this->controlMethod=cm;
+  	StaticJsonDocument<200> obj;
+	obj["Subject"] = "controlmethod";
+	obj["ControlMethod"] = cm;
+	String str;
+	serializeJson(obj, str);
+	ws->broadcastToClient(str);
+	Serial.println(str);
 }
 
 void ManualInputs::setTargets(int az, int el, int roll)
