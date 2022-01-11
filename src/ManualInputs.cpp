@@ -247,15 +247,17 @@ void ManualInputs::initManualControl() {
   
   //if (!manualServo) {
     
-    setEncPixelColorAll(0,255,0);
+	setEncPixelColorAll(0,255,0);
+
+	setControlMethod(MANUAL);
 	
-	StaticJsonDocument<200> obj;
-	obj["Subject"] = "controlmethod";
-   obj["ControlMethod"] = 0; // 0 = MANUAL as defined in PositionControl on the tracker side
-	String str;
-    serializeJson(obj, str);
+	// StaticJsonDocument<200> obj;
+	// obj["Subject"] = "controlmethod";
+  //  obj["ControlMethod"] = 0; // 0 = MANUAL as defined in PositionControl on the tracker side
+	// String str;
+  //   serializeJson(obj, str);
     
-	ws->broadcastToClient(str); 
+	// ws->broadcastToClient(str); 
 
 
 
@@ -281,15 +283,16 @@ void ManualInputs::initManualControl() {
 void ManualInputs::disableManualControl() {
   //if (manualServo) {
 
-    setEncPixelColorAll(255,0,0);
+  setEncPixelColorAll(255,0,0);
 
-	StaticJsonDocument<200> obj;
-	obj["Subject"] = "controlmethod";
-    obj["ControlMethod"] = 1; // 1 = AUTO as defined in PositionControl on the tracker side
-	String str;
-    serializeJson(obj, str);
-    
-	ws->broadcastToClient(str); 
+  setControlMethod(AUTO);
+
+	// StaticJsonDocument<200> obj;
+	// obj["Subject"] = "controlmethod";
+  // obj["ControlMethod"] = 1; // 1 = AUTO as defined in PositionControl on the tracker side
+	// String str;
+  // serializeJson(obj, str);
+  // ws->broadcastToClient(str); 
 
     // digitalWrite(TFT1, LOW);
     // String txt = "Manual servo inactive";
@@ -333,7 +336,7 @@ byte ManualInputs::getControlMethod()
 void ManualInputs::setControlMethod(byte cm)
 {
 	this->controlMethod=cm;
-  	StaticJsonDocument<200> obj;
+  StaticJsonDocument<200> obj;
 	obj["Subject"] = "controlmethod";
 	obj["ControlMethod"] = cm;
 	String str;
