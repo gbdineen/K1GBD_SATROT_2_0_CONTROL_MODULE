@@ -115,11 +115,10 @@ void ManualInputs::buttonCheck()
 		if (!manualControl)
 		{
 			initManualControl();
-      		for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
+      for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
 			{ 
 				encoders[enc].setEncoderPosition(0); // Set encoders to zero so as to jerk the antenna around
 			}
-			;
 		}
 	}
 	else if (btnState==LOW)
