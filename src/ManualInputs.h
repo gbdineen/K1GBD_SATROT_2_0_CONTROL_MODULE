@@ -32,6 +32,7 @@ class ManualInputs
         uint8_t menuPos;
         uint16_t currPressedEnc = 999;
         bool manualControl;
+        bool buttonPressed = false;
         bool rollControl = false;
         bool encPressed = false;
         bool found_encoders[2] = {false, false};

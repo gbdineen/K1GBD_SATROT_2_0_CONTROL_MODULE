@@ -112,34 +112,43 @@ void ManualInputs::buttonCheck()
 	// Check silver button for manual servo control
 	if (btnState==HIGH)
 	{
-		if (!manualControl)
+		// if (!manualControl)
+		// {
+		if (controlMethod==MANUAL_POSITION)
 		{
-			initManualControl();
-      for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
-			{ 
-				encoders[enc].setEncoderPosition(0); // Set encoders to zero so as to jerk the antenna around
-			}
+			setControlMethod(MANUAL_SPEED);
 		}
+      	//initManualControl();
+      	// for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
+		// 	{ 
+		// 		encoders[enc].setEncoderPosition(0); // Set encoders to zero so as to jerk the antenna around
+		// 	}
+		// }
+		//}
 	}
 	else if (btnState==LOW)
 	{
-		if (manualControl)
+		// if (manualControl)
+		// {
+		if (controlMethod==MANUAL_SPEED)
 		{
-			disableManualControl();
-			if (!prevAz || !prevEl|| !prevRoll)
-			{
-				for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
-				{ 
-					encoders[enc].setEncoderPosition(0); // Set encoders to zero so as to jerk the antenna around
-				}
-			}
-			else
-			{
-				encoders[0].setEncoderPosition(prevAz);
-				encoders[1].setEncoderPosition(prevEl);
-			}
-      		
+			setControlMethod(MANUAL_POSITION);
 		}
+		//disableManualControl();
+		// if (!prevAz || !prevEl|| !prevRoll)
+		// {
+		// 	for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
+		// 	{ 
+		// 		encoders[enc].setEncoderPosition(0); // Set encoders to zero so as to jerk the antenna around
+		// 	}
+		// }
+		// else
+		// {
+		// 	encoders[0].setEncoderPosition(prevAz);
+		// 	encoders[1].setEncoderPosition(prevEl);
+		// }
+      		
+		//}
 	}
 }
 
@@ -334,8 +343,36 @@ byte ManualInputs::getControlMethod()
 
 void ManualInputs::setControlMethod(byte cm)
 {
+	
 	this->controlMethod=cm;
-  StaticJsonDocument<200> obj;
+	Serial.print("======== setControlMethod: "); Serial.println(cm);
+	
+	if (cm==MANUAL_SPEED)
+	{
+		setEncPixelColorAll(0,255,0);	
+		for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
+		{ 
+			encoders[enc].setEncoderPosition(0); // Set encoders to zero so as to jerk the antenna around
+		}
+	}
+	else if (cm==MANUAL_POSITION)
+	{
+		setEncPixelColorAll(255,0,0);
+		if (!prevAz || !prevEl|| !prevRoll)
+		{
+			for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
+			{ 
+				encoders[enc].setEncoderPosition(0); // Set encoders to zero so as to jerk the antenna around
+			}
+		}
+		else
+		{
+			encoders[0].setEncoderPosition(prevAz);
+			encoders[1].setEncoderPosition(prevEl);
+		}
+	}
+
+	StaticJsonDocument<200> obj;
 	obj["Subject"] = "controlmethod";
 	obj["ControlMethod"] = cm;
 	String str;
