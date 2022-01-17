@@ -248,7 +248,7 @@ void ManualInputs::initManualControl() {
     
 	setEncPixelColorAll(0,255,0);
 
-	setControlMethod(MANUAL);
+	setControlMethod(MANUAL_SPEED);
 	
 	// StaticJsonDocument<200> obj;
 	// obj["Subject"] = "controlmethod";
@@ -284,7 +284,7 @@ void ManualInputs::disableManualControl() {
 
   setEncPixelColorAll(255,0,0);
 
-  setControlMethod(AUTO);
+  setControlMethod(MANUAL_POSITION);
 
 	// StaticJsonDocument<200> obj;
 	// obj["Subject"] = "controlmethod";

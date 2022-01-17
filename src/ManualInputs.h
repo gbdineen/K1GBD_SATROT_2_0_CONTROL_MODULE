@@ -7,9 +7,12 @@
 #include <ArduinoJson.h>
 #include "WS_Server.h"
 
-#define MANUAL 0
-#define AUTO 1
-#define UPD 2
+// #define MANUAL 0
+// #define AUTO 1
+// #define UPD 2
+#define MANUAL_SPEED 0 // speed control via rotary knobs
+#define MANUAL_POSITION 1 // az/el changes updated via rotary knobs
+#define UDP 2 // az/el updated via UDP packets
 #define SS_SWITCH 24
 #define SS_NEOPIX 6
 #define SEESAW_BASE_ADDR 0x36
@@ -19,7 +22,7 @@ class ManualInputs
 {
     private:
         
-        byte controlMethod = AUTO;
+        byte controlMethod = MANUAL_POSITION;
         int prevAz=false;
         int prevEl=false;
         int prevRoll=false;

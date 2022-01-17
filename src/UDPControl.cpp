@@ -49,7 +49,7 @@ void UDPControl::parseUDP(AsyncUDPPacket packet)
 		{
 			//udpPingPong = true;
 			//tracking=true;
-			mi->setControlMethod(UPD);
+			mi->setControlMethod(UDP);
 			udpActive=true;
 			byte index = 0;
 			char *initkeps = (char*) packet.data();
