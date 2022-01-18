@@ -76,25 +76,78 @@ void ManualInputs::encoderCheck() {
 		int dir; 
 		if (new_position>encoder_position)
 		{
-			dir =0;
-			if (new_position>0)
+			dir=0;
+			if (controlMethod==MANUAL_SPEED)
 			{
-				encoders[enc].setEncoderPosition(-1);
+				if (new_position>0)
+				{
+					encoders[enc].setEncoderPosition(-1);
+				}
 			}
-	  }
-	  else if (new_position<encoder_position)
-	  {
+			else if (controlMethod==MANUAL_POSITION)
+			{
+				if (new_position<1)
+				{
+					encoders[enc].setEncoderPosition(0);
+				}
+				else
+				{
+					if (enc==AZIMUTH_SERVO)
+					{
+						if (new_position>358)
+						{
+							encoders[enc].setEncoderPosition(-359);	
+						}
+					}
+					else if (enc==ELEVATION_SERVO)
+					{
+						if (new_position>89)
+						{
+							encoders[enc].setEncoderPosition(-90);	
+						}
+					}
+				}
+			}
+	  	}
+		else if (new_position<encoder_position)
+		{
 			dir=1;
-			if (new_position<0)
+			if (controlMethod==MANUAL_SPEED)
 			{
-				encoders[enc].setEncoderPosition(1);
+				if (new_position<0)
+				{
+					encoders[enc].setEncoderPosition(1);
+				}
 			}
-	  }
-	  else
-	  {
-		  dir = 2;
-
-	  }
+			else if (controlMethod==MANUAL_POSITION)
+			{
+				if (new_position<1)
+				{
+					encoders[enc].setEncoderPosition(0);
+				}
+				else
+				{
+					if (enc==AZIMUTH_SERVO)
+					{
+						if (new_position<1)
+						{
+							encoders[enc].setEncoderPosition(0);	
+						}
+					}
+					else if (enc==ELEVATION_SERVO)
+					{
+						if (new_position<1)
+						{
+							encoders[enc].setEncoderPosition(0);	
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			dir = 2;
+		}
 	  
       updateEncPos(enc, dir);
     
@@ -297,7 +350,7 @@ void ManualInputs::initRollControl(uint8_t whatEnc) {
 
 void ManualInputs::disableRollControl(uint8_t whatEnc) {
 
-  if (manualControl) {
+  if (controlMethod==MANUAL_SPEED) {
     setEncPixelColorSingle(whatEnc,0,255,0);
   } else {
     setEncPixelColorSingle(whatEnc,255,0,0);

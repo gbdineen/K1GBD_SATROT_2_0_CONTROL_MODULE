@@ -17,6 +17,9 @@
 #define SS_NEOPIX 6
 #define SEESAW_BASE_ADDR 0x36
 #define BTN_INPUT 39
+#define AZIMUTH_SERVO 0
+#define ELEVATION_SERVO 1
+#define ROLL_MOTOR 2
 
 class ManualInputs
 {
