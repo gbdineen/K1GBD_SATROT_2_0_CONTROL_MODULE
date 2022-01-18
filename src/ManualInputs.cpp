@@ -69,12 +69,34 @@ void ManualInputs::encoderCheck() {
     
     new_position= -(new_position);  // Make sure clockwise turns are positive. Default is opposite for some reason. 
     
-    if (encoder_positions[enc] != new_position) {  // Check for encoder dial movement
-      //digitalWrite(TFT1, HIGH);
-      //digitalWrite(TFT2, LOW);
-      encoder_positions[enc] = new_position;
-      
-      updateEncPos(enc);
+	if (encoder_positions[enc] != new_position) {  // Check for encoder dial movement
+		//digitalWrite(TFT1, HIGH);
+		//digitalWrite(TFT2, LOW);
+		encoder_positions[enc] = new_position;
+		int dir; 
+		if (new_position>encoder_position)
+		{
+			dir =0;
+			if (new_position>0)
+			{
+				encoders[enc].setEncoderPosition(-1);
+			}
+	  }
+	  else if (new_position<encoder_position)
+	  {
+			dir=1;
+			if (new_position<0)
+			{
+				encoders[enc].setEncoderPosition(1);
+			}
+	  }
+	  else
+	  {
+		  dir = 2;
+
+	  }
+	  
+      updateEncPos(enc, dir);
     
     }
     if (! encoders[enc].digitalRead(SS_SWITCH)) {
@@ -152,36 +174,94 @@ void ManualInputs::buttonCheck()
 	}
 }
 
-void ManualInputs::updateEncPos(uint8_t enc) {
+void ManualInputs::updateEncPos(uint8_t enc, int dir) {
 
     StaticJsonDocument<200> encObj;
-    if (manualControl)
+    if (controlMethod==MANUAL_SPEED)
     {
 
-      int dir; 
+		
+		int servoSpeed;
 
-      // Make clockwise turns positive not negative, which is default for some reason
-      double encInvPos = -encoders[enc].getEncoderPosition();
+		if (enc==0)
+		{
+			servoSpeed=9;
+		}
+		else if (enc==1)
+		{
+			servoSpeed=7;
+		}
 
+		// Make clockwise turns positive not negative, which is default for some reason
+		encInvPos = -encoders[enc].getEncoderPosition();
+		Serial.print("=====================================>encInvPos: "); Serial.println(encInvPos);
+		Serial.print("=====================================>prevEncPos: "); Serial.println(prevEncPos);
+		
+		// if (encInvPos>9)
+		// {
+		// 	encoders[enc].setEncoderPosition(10);	
+		// }
+		// // else if (encInvPos<-9 && encInvPos>-11)
+		// // {
+		// // 	encoders[enc].setEncoderPosition(-10);	
+		// // }
 
-      if (encInvPos>0) {
-        dir = 0;
-      } else if (encInvPos<0) {
-        dir = 1;
-        encInvPos = (-encInvPos);
-      } else if (encInvPos==0) {
-        dir = 2;
-    }
+		// if (encInvPos>prevEncPos)
+		// {
+		// 	dir=0;
+		// 	servoSpeed=9;
+		// 	//encInvPos=9;
+		// 	if (encInvPos>0)
+		// 	{
+		// 		encoders[enc].setEncoderPosition(-1);
+		// 	}
+		// }
+		// else if (encInvPos<prevEncPos)
+		// {
+		// 	dir=1;
+		// 	servoSpeed=9;
+		// 	if (encInvPos<0)
+		// 	{
+		// 		encoders[enc].setEncoderPosition(1);
+		// 	}
+		// 	//encInvPos=9;
+		// 	//encoders[enc].setEncoderPosition(-1);
+		// 	// if (encInvPos<=-9)
+		// 	// {
+		// 	// 	encoders[enc].setEncoderPosition(-9);
+		// 	// }
+		// }
+		// else
+		// {
+		// 	dir=2;
+		// 	servoSpeed=0;
+		// 	//encInvPos=0;
+		// 	//encoders[enc].setEncoderPosition(0);
+		// }
+		
+		// if (encInvPos>0) {
+		// 	encoders[enc].setEncoderPosition(5);
+		// 	encInvPos=5;
+		// 	dir = 0;
+		// } else if (encInvPos<0) {
+		// 	dir = 1;
+		// 	//encInvPos = (-encInvPos);
+		// 	encoders[enc].setEncoderPosition(5);
+		// 	encInvPos=5;
+		// } else if (encInvPos==0) {
 
-		encObj["Subject"] = "manualcontrol";
+		// 	dir = 2;
+		// }
+
+		encObj["Subject"] = "MANUAL_SPEED";
 		encObj["Servo"] = enc;
-		encObj["Position"] = encInvPos;
+		encObj["Speed"] = servoSpeed;
 		encObj["RollControl"] = rollControl;
 		encObj["Direction"] = dir;
 	}
-	else
+	else if (controlMethod==MANUAL_POSITION)
 	{
-		encObj["Subject"] = "autocontrol";
+		encObj["Subject"] = "MANUAL_POSITION";
 		encObj["Azimuth"] = -encoders[0].getEncoderPosition();
 		encObj["Elevation"] = -encoders[1].getEncoderPosition();;
 	}	
@@ -189,6 +269,7 @@ void ManualInputs::updateEncPos(uint8_t enc) {
     serializeJson(encObj, encStr);
     Serial.print("ManualInputs::updateEncPos "); Serial.println(encStr);
     ws->broadcastToClient(encStr); 
+	prevEncPos=encInvPos;
 }
 
 void ManualInputs::initRollControl(uint8_t whatEnc) {

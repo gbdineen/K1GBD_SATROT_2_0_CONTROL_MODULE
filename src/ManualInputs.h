@@ -29,6 +29,8 @@ class ManualInputs
         
         // ROTARY ENCODERS
         int32_t encoder_position;
+        int prevEncPos;
+        int encInvPos;
         uint8_t menuPos;
         uint16_t currPressedEnc = 999;
         bool manualControl;
@@ -50,7 +52,7 @@ class ManualInputs
         void initPushButton();
         void encoderCheck();
         void buttonCheck();
-        void updateEncPos(uint8_t enc);
+        void updateEncPos(uint8_t enc, int dir);
         void initRollControl(uint8_t whatEnc);
         void disableRollControl(uint8_t whatEnc);
         void initManualControl();
