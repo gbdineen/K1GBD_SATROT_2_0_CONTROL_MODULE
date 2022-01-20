@@ -29,6 +29,11 @@ class ManualInputs
         int prevAz=false;
         int prevEl=false;
         int prevRoll=false;
+        int dir;
+
+        int currAz;
+        int currEl;
+        int currRoll;
         
         // ROTARY ENCODERS
         int32_t encoder_position;
@@ -62,6 +67,7 @@ class ManualInputs
         void disableManualControl();
         void setEncPixelColorAll(uint32_t r, uint32_t g, uint32_t b);
         void setEncPixelColorSingle(uint8_t whatEnc, uint32_t r, uint32_t g, uint32_t b);
+        void getCurrPosition();
 
 
 
@@ -72,6 +78,7 @@ class ManualInputs
         byte getControlMethod();
         void setControlMethod(byte cm);
         void setTargets(int az, int el, int roll);
+        void setCurrPosition(int az, int el, int roll);
         
         void begin();
         void loop();

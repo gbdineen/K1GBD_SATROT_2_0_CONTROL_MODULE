@@ -21,6 +21,7 @@ class WS_Server
 
         uint8_t systemCalibrated;
         std::function<void(int az, int el, int roll)> targetsCallback;
+        std::function<void(int az, int el, int roll)> positionCallback;
 
     public:
         
@@ -30,7 +31,9 @@ class WS_Server
         void broadcastToClient(String tx);
         void setCalibrationStatus(uint8_t cs);
         bool getCalibrationStatus();
+        void getCurrPosition();
         void setTargetsCallback(std::function<void(int az, int el, int roll)> cb);
+        void setPositionCallback(std::function<void(int az, int el, int roll)> cb);
         void setTargets(int az, int el, int roll);
         void loop();
 

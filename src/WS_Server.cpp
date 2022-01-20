@@ -61,6 +61,11 @@ void WS_Server::setTargetsCallback(std::function<void(int az, int el, int roll)>
     this->targetsCallback=cb;
 }
 
+void WS_Server::setPositionCallback(std::function<void(int az, int el, int roll)> cb)
+{
+    this->positionCallback=cb;
+}
+
 void WS_Server::setTargets(int az, int el, int roll)
 {
 	targetsCallback(az,el,roll);
@@ -111,6 +116,10 @@ void WS_Server::webSocketEvent(byte num, WStype_t type, uint8_t * payload, size_
 				Serial.print("\n----- [Setting Targets 3] -----]\n");
 				
 				this->targetsCallback(obj["Azimuth"],obj["Elevation"],obj["Roll"]);
+			}
+			else if (subject=="current-position")
+			{
+				this->positionCallback(obj["Azimuth"],obj["Elevation"],obj["Roll"]);
 			}
 			
 			
