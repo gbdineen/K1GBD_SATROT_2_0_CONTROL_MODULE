@@ -69,10 +69,6 @@ void ManualInputs::encoderCheck() {
     if (found_encoders[enc] == false) continue;
     int32_t new_position = encoders[enc].getEncoderPosition();
 
-
-		
-    
-    
 	if (encoder_positions[enc] != new_position) {  // Check for encoder dial movement
 
 	//new_position= -(new_position);  // Make sure clockwise turns are positive. Default is opposite for some reason. 
@@ -163,10 +159,7 @@ void ManualInputs::encoderCheck() {
 			dir = 2;
 			updateEncPos(enc, dir);
 		}
-	  
-
-    
-    }
+	}
     if (! encoders[enc].digitalRead(SS_SWITCH)) {
       
       if (!encPressed) {
@@ -202,20 +195,11 @@ void ManualInputs::buttonCheck()
 	// Check silver button for manual servo control
 	if (btnState==HIGH)
 	{
-		// if (!manualControl)
-		// {
 		if (controlMethod==MANUAL_POSITION)
 		{
 			setControlMethod(MANUAL_SPEED);
 		}
-      	//initManualControl();
-      	// for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
-		// 	{ 
-		// 		encoders[enc].setEncoderPosition(0); // Set encoders to zero so as to jerk the antenna around
-		// 	}
-		// }
-		//}
-	}
+   }
 	else if (btnState==LOW)
 	{
 		// if (manualControl)
@@ -259,68 +243,7 @@ void ManualInputs::updateEncPos(uint8_t enc, int dirLoc) {
 		{
 			servoSpeed=9;
 		}
-
-		// Make clockwise turns positive not negative, which is default for some reason
-		//encInvPos = -encoders[enc].getEncoderPosition();
-		//Serial.print("=====================================>encInvPos: "); Serial.println(encInvPos);
-		//Serial.print("=====================================>prevEncPos: "); Serial.println(prevEncPos);
 		
-		// if (encInvPos>9)
-		// {
-		// 	encoders[enc].setEncoderPosition(10);	
-		// }
-		// // else if (encInvPos<-9 && encInvPos>-11)
-		// // {
-		// // 	encoders[enc].setEncoderPosition(-10);	
-		// // }
-
-		// if (encInvPos>prevEncPos)
-		// {
-		// 	dir=0;
-		// 	servoSpeed=9;
-		// 	//encInvPos=9;
-		// 	if (encInvPos>0)
-		// 	{
-		// 		encoders[enc].setEncoderPosition(-1);
-		// 	}
-		// }
-		// else if (encInvPos<prevEncPos)
-		// {
-		// 	dir=1;
-		// 	servoSpeed=9;
-		// 	if (encInvPos<0)
-		// 	{
-		// 		encoders[enc].setEncoderPosition(1);
-		// 	}
-		// 	//encInvPos=9;
-		// 	//encoders[enc].setEncoderPosition(-1);
-		// 	// if (encInvPos<=-9)
-		// 	// {
-		// 	// 	encoders[enc].setEncoderPosition(-9);
-		// 	// }
-		// }
-		// else
-		// {
-		// 	dir=2;
-		// 	servoSpeed=0;
-		// 	//encInvPos=0;
-		// 	//encoders[enc].setEncoderPosition(0);
-		// }
-		
-		// if (encInvPos>0) {
-		// 	encoders[enc].setEncoderPosition(5);
-		// 	encInvPos=5;
-		// 	dir = 0;
-		// } else if (encInvPos<0) {
-		// 	dir = 1;
-		// 	//encInvPos = (-encInvPos);
-		// 	encoders[enc].setEncoderPosition(5);
-		// 	encInvPos=5;
-		// } else if (encInvPos==0) {
-
-		// 	dir = 2;
-		// }
-
 		encObj["Subject"] = "MANUAL_SPEED";
 		encObj["Servo"] = enc;
 		encObj["Speed"] = servoSpeed;
