@@ -7,6 +7,7 @@
 #include <ArduinoJson.h>
 #include <iostream>
 #include <string>
+#include "DisplayControl.h"
 
 class WS_Server
 {
@@ -23,9 +24,11 @@ class WS_Server
         std::function<void(int az, int el, int roll)> targetsCallback;
         std::function<void(int az, int el, int roll)> positionCallback;
 
+        DisplayControl * dc;
+
     public:
         
-        WS_Server();
+        WS_Server(DisplayControl * disCtrl);
         ~WS_Server();
         void begin();
         void broadcastToClient(String tx);

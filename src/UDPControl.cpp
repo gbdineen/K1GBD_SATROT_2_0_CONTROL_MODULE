@@ -49,7 +49,7 @@ void UDPControl::parseUDP(AsyncUDPPacket packet)
 		{
 			//udpPingPong = true;
 			//tracking=true;
-			mi->setControlMethod(UDP);
+			//mi->setControlMethod(UDP);
 			udpActive=true;
 			byte index = 0;
 			char *initkeps = (char*) packet.data();
@@ -74,7 +74,7 @@ void UDPControl::parseUDP(AsyncUDPPacket packet)
 			// if (mi->getControlMethod()==AUTO)
 			// {
 				StaticJsonDocument<200> obj;
-				obj["Subject"] = "udpcontrol";
+				obj["Subject"] = "udpactive";
 				obj["Satellite"] = whatSat;
 				obj["Azimuth"] = kepsAz;
 				obj["Elevation"] = kepsEl;

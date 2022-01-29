@@ -9,6 +9,7 @@
 #include <sstream>
 #include "WS_Server.h"
 #include "ManualInputs.h"
+#include "DisplayControl.h"
 
 class UDPControl
 {
@@ -26,6 +27,8 @@ private:
     //char * initkeps[];
     char *keps[8];
     char *ptr = NULL;
+
+    DisplayControl * dc;
 
     void udpCheck();
 

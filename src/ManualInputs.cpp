@@ -6,9 +6,10 @@ ManualInputs::ManualInputs()
     
 }
 
-ManualInputs::ManualInputs(WS_Server * wsServer)
+ManualInputs::ManualInputs(WS_Server * wsServer, DisplayControl * disCtrl)
 {
     this->ws = wsServer;
+	this->dc = disCtrl;
 
 	auto TgPtr = std::bind(&ManualInputs::setTargets, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 	ws->setTargetsCallback(TgPtr);
@@ -65,12 +66,14 @@ void ManualInputs::initPushButton() {
 
 void ManualInputs::encoderCheck() {
 
+/*
+
   for (uint8_t enc=0; enc<sizeof(found_encoders); enc++) { 
     if (found_encoders[enc] == false) continue;
     int32_t new_position = encoders[enc].getEncoderPosition();
 
-	if (encoder_positions[enc] != new_position) {  // Check for encoder dial movement
-
+	if (encoder_positions[enc] != new_position)  // Check for encoder dial movement
+	{
 	//new_position= -(new_position);  // Make sure clockwise turns are positive. Default is opposite for some reason. 
     
 
@@ -100,14 +103,14 @@ void ManualInputs::encoderCheck() {
 				}
 				else
 				{
-					if (enc==AZIMUTH_SERVO)
+					if (enc==AZIMUTH)
 					{
 						if (new_position>358)
 						{
 							encoders[enc].setEncoderPosition(-359);	
 						}
 					}
-					else if (enc==ELEVATION_SERVO)
+					else if (enc==ELEVATION)
 					{
 						if (new_position>89)
 						{
@@ -136,14 +139,14 @@ void ManualInputs::encoderCheck() {
 				}
 				else
 				{
-					if (enc==AZIMUTH_SERVO)
+					if (enc==AZIMUTH)
 					{
 						if (new_position<1)
 						{
 							encoders[enc].setEncoderPosition(0);	
 						}
 					}
-					else if (enc==ELEVATION_SERVO)
+					else if (enc==ELEVATION)
 					{
 						if (new_position<1)
 						{
@@ -184,7 +187,219 @@ void ManualInputs::encoderCheck() {
       }
     }
      encoder_position=new_position;
-  } 
+  }
+*/
+}
+
+void ManualInputs::azEncoderCheck()
+{
+
+	int32_t new_position = encoders[AZIMUTH].getEncoderPosition();
+	int azDir;
+
+	if (encoder_positions[AZIMUTH] != new_position)  // Check for encoder dial movement
+	{
+		
+		Serial.print("\n");
+		Serial.print("=====================================>az_encoder_position: "); Serial.println(az_encoder_position);
+		Serial.print("=====================================>new_position: "); Serial.println(new_position);
+		
+		
+		encoder_positions[AZIMUTH] = new_position;
+
+		//if (new_position>az_encoder_position && new_position!=0)
+		if (new_position>0 && new_position!=0)
+		{
+			azDir=0;
+			if (controlMethod==MANUAL_SPEED)
+			{
+				encoders[AZIMUTH].setEncoderPosition(1);
+			}
+			else if (controlMethod==MANUAL_POSITION)
+			{
+				if (!rollControl)
+				{
+					if (new_position<1)
+					{
+						encoders[AZIMUTH].setEncoderPosition(1);
+					}
+					else if (new_position>358)
+					{
+						encoders[AZIMUTH].setEncoderPosition(-359);	
+					}
+				}
+				else
+				{
+					encoders[AZIMUTH].setEncoderPosition(1);	
+				}
+			}
+			//updateEncPos(AZIMUTH, azDir);
+		}
+		//else if (new_position<az_encoder_position && new_position!=0)
+		else if (new_position<0 && new_position!=0)
+		{
+			azDir=1;
+			if (controlMethod==MANUAL_SPEED)
+			{
+				encoders[AZIMUTH].setEncoderPosition(-1);
+			}
+			else if (controlMethod==MANUAL_POSITION)
+			{
+				if (!rollControl)
+				{
+					if (new_position<1)
+					{
+						encoders[AZIMUTH].setEncoderPosition(0);
+					}
+				} 
+				else
+				{
+					encoders[AZIMUTH].setEncoderPosition(-1);	
+				}
+			}
+			//updateEncPos(AZIMUTH, azDir);
+		}
+		else if (new_position==0)
+		{
+			azDir = 2;
+			//updateEncPos(AZIMUTH, azDir);
+		}
+		updateEncPos(AZIMUTH, azDir);
+		az_encoder_position=new_position;
+	}
+
+	if (! encoders[AZIMUTH].digitalRead(SS_SWITCH))
+	{
+		if (!azEncPressed)
+		{
+			azEncPressed=true;
+			elEncPressed=false;
+			if (AZIMUTH!=currPressedEnc && !rollControl)
+			{
+				currPressedEnc=AZIMUTH;
+				rollControl=true;
+			}
+			else if (AZIMUTH==currPressedEnc)
+			{
+				rollControl=false;
+			}
+			Serial.print("currPressedEnc "); Serial.print(AZIMUTH); Serial.print(", rollControl "); Serial.println(rollControl);
+			ws->broadcastToClient("pressed"); 
+		}
+	}
+	else if (encoders[AZIMUTH].digitalRead(SS_SWITCH))
+	{
+		if (rollControl && AZIMUTH==currPressedEnc)
+		{
+			initRollControl(AZIMUTH);
+			azEncPressed=false;
+		}
+		else if (!rollControl && AZIMUTH==currPressedEnc)
+		{
+		disableRollControl(AZIMUTH);
+		currPressedEnc=999;
+		azEncPressed=false;
+		}
+	}
+}
+
+void ManualInputs::elEncoderCheck()
+{
+
+	int32_t new_position = encoders[ELEVATION].getEncoderPosition();
+	int elDir;
+
+	if (encoder_positions[ELEVATION] != new_position)  // Check for encoder dial movement
+	{
+		Serial.print("\n");
+		Serial.print("=====================================>el_encoder_position: "); Serial.println(el_encoder_position);
+		Serial.print("=====================================>new_position: "); Serial.println(new_position);
+		
+		
+		//digitalWrite(TFT1, HIGH);
+		//digitalWrite(TFT2, LOW);
+		encoder_positions[ELEVATION] = new_position;
+		if (new_position>0 && new_position!=0)
+		{
+			elDir=0;
+			if (controlMethod==MANUAL_SPEED)
+			{
+				encoders[ELEVATION].setEncoderPosition(1);
+			}
+			else if (controlMethod==MANUAL_POSITION)
+			{
+				if (new_position<1)
+				{
+					encoders[ELEVATION].setEncoderPosition(1);
+				}
+				else
+				{
+					if (new_position>89)
+					{
+						encoders[ELEVATION].setEncoderPosition(-90);	
+					}
+				}
+			}
+			//updateEncPos(ELEVATION, elDir);
+	  	}
+		else if (new_position<0 && new_position!=0)
+		{
+			elDir=1;
+			if (controlMethod==MANUAL_SPEED)
+			{
+				encoders[ELEVATION].setEncoderPosition(-1);
+			}
+			else if (controlMethod==MANUAL_POSITION)
+			{
+				if (new_position<1)
+				{
+					encoders[ELEVATION].setEncoderPosition(0);
+				}
+			}
+			//updateEncPos(ELEVATION, elDir);
+		}
+		else if (new_position==0)
+		{
+			elDir = 2;
+			//updateEncPos(ELEVATION, elDir);
+		}
+		updateEncPos(ELEVATION, elDir);
+		el_encoder_position=new_position;
+	}
+
+	if (! encoders[ELEVATION].digitalRead(SS_SWITCH))
+	{
+		if (!elEncPressed)
+		{
+			elEncPressed=true;
+			azEncPressed=false;
+			if (ELEVATION!=currPressedEnc && !rollControl)
+			{
+				currPressedEnc=ELEVATION;
+				rollControl=true;
+			}
+			else if (ELEVATION==currPressedEnc)
+			{
+				rollControl=false;
+			}
+			Serial.print("currPressedEnc "); Serial.print(ELEVATION); Serial.print(", rollControl "); Serial.println(rollControl);
+			ws->broadcastToClient("pressed"); 
+		}
+	}
+	else if (encoders[ELEVATION].digitalRead(SS_SWITCH))
+	{
+		if (rollControl && ELEVATION==currPressedEnc)
+		{
+			initRollControl(ELEVATION);
+			elEncPressed=false;
+		}
+		else if (!rollControl && ELEVATION==currPressedEnc)
+		{
+		disableRollControl(ELEVATION);
+		currPressedEnc=999;
+		elEncPressed=false;
+		}
+	}
 }
 
 void ManualInputs::buttonCheck()
@@ -202,27 +417,10 @@ void ManualInputs::buttonCheck()
    }
 	else if (btnState==LOW)
 	{
-		// if (manualControl)
-		// {
 		if (controlMethod==MANUAL_SPEED)
 		{
 			setControlMethod(MANUAL_POSITION);
 		}
-		//disableManualControl();
-		// if (!prevAz || !prevEl|| !prevRoll)
-		// {
-		// 	for (uint8_t enc=0; enc<sizeof(found_encoders); enc++)
-		// 	{ 
-		// 		encoders[enc].setEncoderPosition(0); // Set encoders to zero so as to jerk the antenna around
-		// 	}
-		// }
-		// else
-		// {
-		// 	encoders[0].setEncoderPosition(prevAz);
-		// 	encoders[1].setEncoderPosition(prevEl);
-		// }
-      		
-		//}
 	}
 }
 
@@ -254,8 +452,11 @@ void ManualInputs::updateEncPos(uint8_t enc, int dirLoc) {
 	{
 		encObj["Subject"] = "MANUAL_POSITION";
 		encObj["Azimuth"] = encoders[0].getEncoderPosition();
-		encObj["Elevation"] = encoders[1].getEncoderPosition();;
-	}	
+		encObj["Elevation"] = encoders[1].getEncoderPosition();
+		encObj["RollControl"] = rollControl;
+		encObj["Direction"] = dirLoc;
+	}
+
     String encStr;
     serializeJson(encObj, encStr);
     Serial.print("ManualInputs::updateEncPos "); Serial.println(encStr);
@@ -487,9 +688,9 @@ void ManualInputs::getCurrPosition()
 
 void ManualInputs::setCurrPosition(int az, int el, int roll) 
 {
-	currAz = az;
-    currEl = el;
-    currRoll = roll;
+	this->currAz = az;
+    this->currEl = el;
+    this->currRoll = roll;
 	Serial.print("setCurrPosition --------> ");
 	Serial.print("currAz: "); Serial.print(currAz);
 	Serial.print(" currEl: "); Serial.print(currEl);
@@ -498,7 +699,9 @@ void ManualInputs::setCurrPosition(int az, int el, int roll)
 
 void ManualInputs::loop()
 {
-	encoderCheck();
+	//encoderCheck();
+	azEncoderCheck();
+	elEncoderCheck();
 	buttonCheck();
 }
 

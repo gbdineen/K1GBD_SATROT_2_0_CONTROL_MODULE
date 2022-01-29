@@ -1,10 +1,9 @@
 #include "WS_Server.h"  
 
 
-WS_Server::WS_Server()
+WS_Server::WS_Server(DisplayControl * disCtrl)
 {
-    //std::cout << "WS_Server constructor init\n";
-    //Serial.print("Serial Constructing");
+    this->dc = disCtrl;
 }
 
 
